@@ -4,37 +4,23 @@ from typing import List
 from fastapi import FastAPI
 from pydantic import BaseModel
 import uvicorn
-from peers import Peers_Retriever
 from stock import Data_Retriever
 from fastapi.responses import JSONResponse
 import yfinance as yf
-from fastapi.middleware.cors import CORSMiddleware
-# import strawberry
 from fastapi import FastAPI
-# from strawberry.fastapi import GraphQLRouter
-# from graphqlQuery.companyOverview import CompanyOverview
-from graphqlQuery.peersInfo import peers_info
 
-NASDAQ_CSV_PATH = os.getenv("NASDAQ_CSV_PATH", os.path.join(os.path.dirname(__file__), "data", "nasdaq.csv"))
-SP500_CSV_PATH = os.getenv("SP500_CSV_PATH", os.path.join(os.path.dirname(__file__), "data", "sp500_companies.csv"))
 
-stocks = Data_Retriever(NASDAQ_CSV_PATH)
-peers = Peers_Retriever(SP500_CSV_PATH)
+path = os.path.join("content","nasdaq.csv")
+stocks = Data_Retriever(path)
+
+
 
 app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 @app.get("/stocks")
 async def get_all_stocks(page:int = 1):
     data = stocks.ticker_dict
-    limit = 253
+    limit = 300
     all_items = list(data.items())  # Convert dictionary to a list of tuples
     total_items = len(all_items)
     total_pages = (total_items // limit) + (1 if total_items % limit > 0 else 0)
@@ -102,26 +88,26 @@ async def get_history(ticker):
 async def get_company_by_sector(sector):
     return JSONResponse(stocks.sector_wise_grouping(sector))
 
-@app.get('/stocks/peers/industry/{industry}',  response_model=List[peers_info])
-async def get_company_by_industry(industry: str) -> List[str]:
-    """Fetch top tickers based on industry."""
-    # print(industry)
-    tickers = peers.topFivePeers(industry)
-    # print(tickers)
-    results = []
-    for ticker in tickers:
-        tkr = yf.Ticker(ticker)
-        info = tkr.info
-        # Remove unwanted fields
-        info.pop('companyOfficers', None)
-        info.pop('52WeekChange', None)
-        # Map fields to PeersInfo
-        valid_fields = {
-            field: str(info.get(field)) if isinstance(info.get(field), (int, float)) else info.get(field)
-            for field in peers_info.__annotations__.keys()
-        }
-        results.append(peers_info(**valid_fields).model_dump())
-    return JSONResponse(results)
+# @app.get('/stocks/peers/industry/{industry}',  response_model=List[peers_info])
+# async def get_company_by_industry(industry: str) -> List[str]:
+#     """Fetch top tickers based on industry."""
+#     print(industry)
+#     tickers = peers.topFivePeers(industry)
+#     print(tickers)
+#     results = []
+#     for ticker in tickers:
+#         tkr = yf.Ticker(ticker)
+#         info = tkr.info
+#         # Remove unwanted fields
+#         info.pop('companyOfficers', None)
+#         info.pop('52WeekChange', None)
+#         # Map fields to PeersInfo
+#         valid_fields = {
+#             field: str(info.get(field)) if isinstance(info.get(field), (int, float)) else info.get(field)
+#             for field in peers_info.__annotations__.keys()
+#         }
+#         results.append(peers_info(**valid_fields).model_dump())
+#     return JSONResponse(results)
 
 
 # @strawberry.type

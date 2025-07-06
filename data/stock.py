@@ -33,11 +33,11 @@ class Data_Retriever:
         
     def company_overview(self, ticker):
         tkr = self.get_ticker(ticker)
-        # print(tkr, ticker)
+        print(tkr, ticker)
         info = tkr.info
-        # print(info)
+        print(info)
         del info['companyOfficers']
-        # print(info)
+        print(info)
         return info
         # return tkr.info['longBusinessSummary']
         # if tkr not in self.companies.keys:
@@ -120,7 +120,7 @@ class Data_Retriever:
         #             industry_dict[key] = []
         #         industry_dict[key].append(self.ticker_dict[key])
         # return industry_dict
-        # print(industry)
+        print(industry)
         company = yf.Industry(industry)
         dct = company.top_companies.to_dict()
         companies:dict = dct['name']
