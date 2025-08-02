@@ -1,5 +1,4 @@
-import os
-import yfinance as yf
+
 
 # tech = yf.Sector('technology')
 # indus = tech.industries
@@ -14,9 +13,22 @@ import yfinance as yf
 # res_list = list(companies.keys())
 # print(res_list[:5])
 import yfinance as yf
-dat = yf.Ticker("ADBE") 
-df = dat.info
-print(df)
+
+# Replace 'AAPL' with your desired stock ticker symbol
+ticker = yf.Ticker('AAPL')
+data = ticker.history(period='1d')
+current_price = data['Close'][0]
+print(f"Current Price: {current_price}")
+
+
+# S&P 500 Index (ticker: ^GSPC)
+# sp500 = yf.Ticker("^NSEI")
+
+# # Get historical market data
+# hist = sp500.history(period="5d")
+
+# print(hist)
+
 # tkr = yf.Ticker("ADBE")
 # print(tkr.quarterly_earnings)
 # df = tkr.balance_sheet
